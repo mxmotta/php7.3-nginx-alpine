@@ -1,0 +1,46 @@
+---
+version: '2'
+services:
+  app:
+    depends_on:
+    - db
+    - redis
+    build: .
+    working_dir: /var/www/html
+    volumes:
+    - ./:/var/www/html
+    ports:
+    - 8001:80
+    env_file:
+    - .env
+
+  db:
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=app
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=app
+    volumes:
+      - ./mysql-data:/var/lib/mysql:rw
+    ports:
+      - 33001:3306
+
+  phpmyadmin:
+    links:
+      - db
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8101:80
+    environment:
+      MYSQL_ROOT_PASSWORD: app
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app
+      PMA_USER: app
+      PMA_PASSWORD: app
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379
